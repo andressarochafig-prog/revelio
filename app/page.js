@@ -1,13 +1,24 @@
+'use client'
+import { useEffect } from 'react'
+import { createClient } from './lib/supabase'
+
 export default function Home() {
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = '/dashboard'
+    })
+  }, [])
+
   return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', fontFamily: 'inherit' }}>
 
       {/* NAV */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 32px' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 32px', backgroundColor: '#2d1b4e', borderBottom: '0.5px solid rgba(255,255,255,0.15)' }}>
         <span style={{ color: '#fff', fontSize: '22px', fontWeight: '800' }}>Revelio</span>
-        <button style={{ border: '0.5px solid rgba(255,255,255,0.3)', color: '#fff', background: 'transparent', padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>
+        <a href="/login" style={{ border: '0.5px solid rgba(255,255,255,0.3)', color: '#fff', background: 'transparent', padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', textDecoration: 'none' }}>
           Entrar
-        </button>
+        </a>
       </nav>
 
       {/* HERO */}
@@ -21,9 +32,9 @@ export default function Home() {
         <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '15px', lineHeight: '1.6', maxWidth: '360px', margin: '0 auto 32px' }}>
           Converse com o Lio, registre seus gastos e receba conselhos personalizados para o seu perfil.
         </p>
-        <button style={{ background: '#F5C842', color: '#1a0f2e', border: 'none', padding: '13px 32px', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+        <a href="/login" style={{ background: '#F5C842', color: '#1a0f2e', border: 'none', padding: '13px 32px', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}>
           Começar grátis →
-        </button>
+        </a>
       </section>
 
       {/* DIVIDER */}
@@ -45,7 +56,7 @@ export default function Home() {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <img src="/lio.png" alt="Lio" style={{ width: '280px', height: 'auto' }} />
+          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '280px', height: 'auto' }} />
           <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', color: 'rgba(255,255,255,0.7)', fontSize: '12px', lineHeight: '1.5', maxWidth: '200px' }}>
             Olá! Vamos organizar suas finanças juntos?
           </div>
@@ -78,9 +89,9 @@ export default function Home() {
 
       {/* CTA */}
       <section style={{ textAlign: 'center', padding: '48px 32px 56px' }}>
-        <button style={{ background: '#F5C842', color: '#1a0f2e', border: 'none', padding: '13px 32px', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+        <a href="/login" style={{ background: '#F5C842', color: '#1a0f2e', border: 'none', padding: '13px 32px', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}>
           Criar minha conta grátis →
-        </button>
+        </a>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '12px 0 0' }}>Sem cartão de crédito. Sem complicação.</p>
       </section>
 

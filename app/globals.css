@@ -7,3 +7,21 @@
 body {
   background-color: #1a0f2e;
 }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1a0f2e;
+}
+
+@keyframes flutuar {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.lio-flutuando {
+  animation: flutuar 3s ease-in-out infinite;
+}
