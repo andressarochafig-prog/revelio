@@ -34,7 +34,7 @@ Regras:
       { role: 'system', content: systemPrompt },
       ...mensagens
     ],
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     max_tokens: 500,
   })
 
