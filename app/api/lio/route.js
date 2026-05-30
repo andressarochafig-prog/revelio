@@ -1,10 +1,21 @@
-export const maxDuration = 30
 import Groq from 'groq-sdk'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export const maxDuration = 30
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 export async function POST(request) {
   const { mensagens, perfil } = await request.json()
+
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    { cookies: { getAll: () => cookieStore.getAll(), setAll: (c) => c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } }
+  )
+  const { data: { user } } = await supabase.auth.getUser()
 
   const systemPrompt = `Você é o Lio, um assistente financeiro pessoal acolhedor, inteligente e empático do app Revelio.
 
@@ -16,18 +27,23 @@ Informações do usuário:
 - Outros dependentes: ${perfil.dependentes}
 
 Suas responsabilidades:
-1. Receber gastos em texto livre (ex: "uber 11, mercado 320, ifood 35") e confirmar que entendeu
-2. Dar conselhos financeiros personalizados baseados no perfil da pessoa
-3. Sugerir investimentos simples quando fizer sentido (ex: Tesouro Direto) de forma leve
-4. Fazer perguntas para entender melhor a situação financeira
-5. Sempre considerar o contexto de vida da pessoa (filhos, estado civil, renda)
+1. Receber gastos em texto livre e confirmar que entendeu
+2. Dar conselhos financeiros personalizados baseados no perfil
+3. Sugerir investimentos simples quando fizer sentido
+4. Sempre considerar o contexto de vida da pessoa
+
+Quando o usuário mencionar gastos, extraia os dados e inclua no final da sua resposta um JSON no formato:
+<gastos>
+[{"descricao": "mercado", "valor": 320, "categoria": "alimentação"}, {"descricao": "uber", "valor": 45, "categoria": "transporte"}]
+</gastos>
+
+Categorias possíveis: alimentação, transporte, saúde, educação, lazer, vestuário, moradia, outros
 
 Regras:
-- Seja sempre acolhedor, nunca frio ou robótico
-- Use linguagem simples, sem jargões financeiros complexos
-- Respostas curtas e diretas (máximo 3 parágrafos)
-- Sempre em português brasileiro
-- Nunca dê conselhos de investimento de alto risco`
+- Seja sempre acolhedor, nunca frio
+- Use linguagem simples
+- Respostas curtas (máximo 3 parágrafos)
+- Sempre em português brasileiro`
 
   const completion = await groq.chat.completions.create({
     messages: [
@@ -38,5 +54,30 @@ Regras:
     max_tokens: 500,
   })
 
-  return Response.json({ resposta: completion.choices[0].message.content })
+  const respostaCompleta = completion.choices[0].message.content
+
+  // Extrai e salva os gastos
+  const match = respostaCompleta.match(/<gastos>([\s\S]*?)<\/gastos>/)
+  if (match && user) {
+    try {
+      const gastosData = JSON.parse(match[1])
+      const agora = new Date()
+      const gastosParaSalvar = gastosData.map(g => ({
+        user_id: user.id,
+        descricao: g.descricao,
+        valor: g.valor,
+        categoria: g.categoria,
+        mes: agora.getMonth() + 1,
+        ano: agora.getFullYear(),
+      }))
+      await supabase.from('gastos').insert(gastosParaSalvar)
+    } catch (e) {
+      console.error('Erro ao salvar gastos:', e)
+    }
+  }
+
+  // Remove o JSON da resposta antes de mostrar pro usuário
+  const respostaLimpa = respostaCompleta.replace(/<gastos>[\s\S]*?<\/gastos>/g, '').trim()
+
+  return Response.json({ resposta: respostaLimpa })
 }
