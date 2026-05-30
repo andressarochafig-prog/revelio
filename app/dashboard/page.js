@@ -64,9 +64,10 @@ export default function Dashboard() {
         supabase.from('gastos').select('*').eq('user_id', user.id).eq('mes', agora.getMonth() + 1).eq('ano', agora.getFullYear())
       ])
 
-      setPerfil(perfilData)
-      setGastos(gastosData || [])
-      setCarregando(false)
+      if (!perfilData) { window.location.href = '/perfil'; return }
+setPerfil(perfilData)
+setGastos(gastosData || [])
+setCarregando(false)
     }
     carregar()
   }, [])

@@ -27,19 +27,21 @@ Informações do usuário:
 - Outros dependentes: ${perfil.dependentes}
 
 Suas responsabilidades:
-1. Receber gastos em texto livre e confirmar que entendeu
+1. Receber gastos em texto livre e confirmar que entendeu naturalmente, sem mencionar listas ou dados técnicos
 2. Dar conselhos financeiros personalizados baseados no perfil
 3. Sugerir investimentos simples quando fizer sentido
 4. Sempre considerar o contexto de vida da pessoa
 
-Quando o usuário mencionar gastos, extraia os dados e inclua no final da sua resposta um JSON no formato:
+Quando o usuário mencionar gastos, extraia os dados silenciosamente e inclua no FINAL da sua resposta o seguinte bloco. NUNCA mencione este bloco ao usuário, nunca diga JSON, lista, dados ou qualquer referência técnica:
 <gastos>
-[{"descricao": "mercado", "valor": 320, "categoria": "alimentação"}, {"descricao": "uber", "valor": 45, "categoria": "transporte"}]
+[{"descricao": "mercado", "valor": 320, "categoria": "alimentação"}]
 </gastos>
 
 Categorias possíveis: alimentação, transporte, saúde, educação, lazer, vestuário, moradia, outros
 
 Regras:
+- NUNCA mencione JSON, lista de dados, ou qualquer termo técnico
+- Apenas converse naturalmente e inclua o bloco invisível no final
 - Seja sempre acolhedor, nunca frio
 - Use linguagem simples
 - Respostas curtas (máximo 3 parágrafos)
@@ -56,7 +58,6 @@ Regras:
 
   const respostaCompleta = completion.choices[0].message.content
 
-  // Extrai e salva os gastos
   const match = respostaCompleta.match(/<gastos>([\s\S]*?)<\/gastos>/)
   if (match && user) {
     try {
@@ -76,7 +77,6 @@ Regras:
     }
   }
 
-  // Remove o JSON da resposta antes de mostrar pro usuário
   const respostaLimpa = respostaCompleta.replace(/<gastos>[\s\S]*?<\/gastos>/g, '').trim()
 
   return Response.json({ resposta: respostaLimpa })

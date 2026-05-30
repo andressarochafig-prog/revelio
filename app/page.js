@@ -56,7 +56,7 @@ export default function Home() {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '280px', height: 'auto' }} />
+          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '90px', height: 'auto' }} />
           <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', color: 'rgba(255,255,255,0.7)', fontSize: '12px', lineHeight: '1.5', maxWidth: '200px' }}>
             Olá! Vamos organizar suas finanças juntos?
           </div>
