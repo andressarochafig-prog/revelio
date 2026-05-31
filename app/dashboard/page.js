@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase'
 
-function CategoriaAccordion({ categorias, gastos, totalGastos }) {
+function CategoriaAccordion({ categorias, gastos, totalGastos, deletarGasto }) {
   const [aberta, setAberta] = useState(null)
 
   return (
@@ -18,9 +18,7 @@ function CategoriaAccordion({ categorias, gastos, totalGastos }) {
                 onClick={() => setAberta(estaAberta ? null : cat)}
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', cursor: 'pointer', background: estaAberta ? 'rgba(255,255,255,0.06)' : 'transparent' }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ color: estaAberta ? '#F5C842' : 'rgba(255,255,255,0.7)', fontSize: '13px', textTransform: 'capitalize', fontWeight: estaAberta ? '700' : '400' }}>{cat}</span>
-                </div>
+                <span style={{ color: estaAberta ? '#F5C842' : 'rgba(255,255,255,0.7)', fontSize: '13px', textTransform: 'capitalize', fontWeight: estaAberta ? '700' : '400' }}>{cat}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span style={{ color: '#fff', fontSize: '13px', fontWeight: '600' }}>R$ {val.toLocaleString('pt-BR')}</span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>{estaAberta ? '▲' : '▼'}</span>
@@ -32,9 +30,12 @@ function CategoriaAccordion({ categorias, gastos, totalGastos }) {
               {estaAberta && (
                 <div style={{ padding: '8px 14px 12px' }}>
                   {itens.map(item => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
                       <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', textTransform: 'capitalize' }}>{item.descricao}</span>
-                      <span style={{ color: '#ef4444', fontSize: '12px' }}>- R$ {item.valor.toLocaleString('pt-BR')}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ color: '#ef4444', fontSize: '12px' }}>- R$ {item.valor.toLocaleString('pt-BR')}</span>
+                        <button onClick={() => deletarGasto(item.id)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '14px', padding: '2px 6px', borderRadius: '4px' }}>✕</button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -65,12 +66,18 @@ export default function Dashboard() {
       ])
 
       if (!perfilData) { window.location.href = '/perfil'; return }
-setPerfil(perfilData)
-setGastos(gastosData || [])
-setCarregando(false)
+      setPerfil(perfilData)
+      setGastos(gastosData || [])
+      setCarregando(false)
     }
     carregar()
   }, [])
+
+  async function deletarGasto(id) {
+    const supabase = createClient()
+    await supabase.from('gastos').delete().eq('id', id)
+    setGastos(prev => prev.filter(g => g.id !== id))
+  }
 
   if (carregando) return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -97,9 +104,8 @@ setCarregando(false)
   return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', fontFamily: 'inherit' }}>
 
-      {/* NAV */}
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', backgroundColor: '#2d1b4e', borderBottom: '0.5px solid rgba(255,255,255,0.15)' }}>
-        <span style={{ color: '#fff', fontSize: '18px', fontWeight: '800' }}>Revelio</span>
+        <a href="/" style={{ color: '#fff', fontSize: '18px', fontWeight: '800', textDecoration: 'none' }}>Revelio</a>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <a href="/onboarding" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', textDecoration: 'none' }}>Chat com Lio</a>
           <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
@@ -109,13 +115,11 @@ setCarregando(false)
 
       <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        {/* STATUS */}
         <div style={{ background: `rgba(${status === 'vermelho' ? '239,68,68' : status === 'laranja' ? '249,115,22' : '34,197,94'},0.1)`, border: `0.5px solid ${corStatus}`, borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: corStatus, flexShrink: 0 }} />
           <p style={{ color: '#fff', fontSize: '14px', margin: 0, fontWeight: '600' }}>{mensagemStatus}</p>
         </div>
 
-        {/* CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '16px' }}>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Renda</p>
@@ -131,7 +135,6 @@ setCarregando(false)
           </div>
         </div>
 
-        {/* BARRA DE PROGRESSO */}
         <div style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <p style={{ color: '#fff', fontSize: '13px', fontWeight: '600', margin: 0 }}>Orçamento usado</p>
@@ -142,11 +145,29 @@ setCarregando(false)
           </div>
         </div>
 
-       {/* CATEGORIAS ACCORDION */}
-{Object.keys(categorias).length > 0 && (
-  <CategoriaAccordion categorias={categorias} gastos={gastos} totalGastos={totalGastos} />
-)}
-</div>
+        {Object.keys(categorias).length > 0 && (
+          <CategoriaAccordion categorias={categorias} gastos={gastos} totalGastos={totalGastos} deletarGasto={deletarGasto} />
+        )}
+
+        {gastos.length === 0 && (
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '40px', textAlign: 'center' }}>
+            <img src="/lio.png" alt="Lio" style={{ width: '64px', marginBottom: '12px' }} />
+            <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: '0 0 8px' }}>Nenhum gasto ainda!</p>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', margin: '0 0 16px' }}>Conta pro Lio seus gastos do mês</p>
+            <a href="/onboarding" style={{ background: '#F5C842', color: '#1a0f2e', padding: '10px 24px', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>Falar com o Lio</a>
+          </div>
+        )}
+
+        <div style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '56px', height: 'auto' }} />
+          <div>
+            <p style={{ color: '#fff', fontSize: '13px', fontWeight: '600', margin: '0 0 4px' }}>Alguma dúvida?</p>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', margin: '0 0 10px' }}>O Lio tá aqui pra te ajudar com suas finanças</p>
+            <a href="/onboarding" style={{ background: '#F5C842', color: '#1a0f2e', padding: '8px 20px', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '700' }}>Falar com o Lio</a>
+          </div>
+        </div>
+
+      </div>
     </main>
   )
 }
