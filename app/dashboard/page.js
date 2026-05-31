@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [perfil, setPerfil] = useState(null)
   const [gastos, setGastos] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [menuAberto, setMenuAberto] = useState(false)
 
   useEffect(() => {
     async function carregar() {
@@ -104,14 +105,31 @@ export default function Dashboard() {
   return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', fontFamily: 'inherit' }}>
 
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', backgroundColor: '#2d1b4e', borderBottom: '0.5px solid rgba(255,255,255,0.15)' }}>
-        <a href="/" style={{ color: '#fff', fontSize: '18px', fontWeight: '800', textDecoration: 'none' }}>Revelio</a>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <a href="/onboarding" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', textDecoration: 'none' }}>Chat com Lio</a>
-          <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>{perfil?.nome}</span>
-        </div>
-      </nav>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', backgroundColor: '#2d1b4e', borderBottom: '0.5px solid rgba(255,255,255,0.15)', position: 'relative' }}>
+  <a href="/" style={{ color: '#fff', fontSize: '18px', fontWeight: '800', textDecoration: 'none' }}>Revelio</a>
+  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+    <a href="/onboarding" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', textDecoration: 'none' }}>Chat com Lio</a>
+    <button onClick={() => setMenuAberto(!menuAberto)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px' }}>
+      <span style={{ display: 'block', width: '20px', height: '2px', background: '#fff', borderRadius: '2px' }} />
+      <span style={{ display: 'block', width: '20px', height: '2px', background: '#fff', borderRadius: '2px' }} />
+      <span style={{ display: 'block', width: '20px', height: '2px', background: '#fff', borderRadius: '2px' }} />
+    </button>
+  </div>
+  {menuAberto && (
+    <div style={{ position: 'absolute', top: '60px', right: '24px', background: '#2d1b4e', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '8px', minWidth: '180px', zIndex: 100 }}>
+      <div style={{ padding: '10px 14px', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+        <p style={{ color: '#fff', fontSize: '13px', fontWeight: '600', margin: 0 }}>{perfil?.nome}</p>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: 0 }}>Minha conta</p>
+      </div>
+      <a href="/perfil" style={{ display: 'block', padding: '10px 14px', color: 'rgba(255,255,255,0.7)', fontSize: '13px', textDecoration: 'none', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+        ✏️ Editar perfil
+      </a>
+      <button onClick={async () => { const supabase = createClient(); await supabase.auth.signOut(); window.location.href = '/' }} style={{ display: 'block', width: '100%', padding: '10px 14px', color: '#ef4444', fontSize: '13px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}>
+        🚪 Sair da conta
+      </button>
+    </div>
+  )}
+</nav>
 
       <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
