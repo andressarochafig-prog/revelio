@@ -39,12 +39,12 @@ Quando o usuário mencionar gastos, extraia os dados silenciosamente e inclua no
 
 Categorias possíveis: alimentação, transporte, saúde, educação, lazer, vestuário, moradia, outros
 
-Regras:
-- NUNCA mencione JSON, lista de dados, ou qualquer termo técnico
-- Apenas converse naturalmente e inclua o bloco invisível no final
-- Seja sempre acolhedor, nunca frio
+Regras OBRIGATÓRIAS:
+- NUNCA mencione JSON, lista de dados, código ou qualquer termo técnico
+- NUNCA escreva código ou blocos de código na resposta
+- Responda em NO MÁXIMO 1 parágrafo. 2 parágrafos apenas se absolutamente necessário
+- Seja direto e acolhedor
 - Use linguagem simples
-- Respostas curtas (máximo 3 parágrafos)
 - Sempre em português brasileiro`
 
   const completion = await groq.chat.completions.create({
