@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase'
 
 export default function Perfil() {
@@ -11,14 +11,36 @@ export default function Perfil() {
     filhos: '',
     dependentes: '',
   })
-  const [carregando, setCarregando] = useState(false)
+  const [carregando, setCarregando] = useState(true)
+  const [salvando, setSalvando] = useState(false)
+
+  useEffect(() => {
+    async function carregarPerfil() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = '/login'; return }
+
+      const { data } = await supabase.from('perfis').select('*').eq('user_id', user.id).single()
+      if (data) {
+        setDados({
+          nome: data.nome || '',
+          renda: data.renda?.toString() || '',
+          estado_civil: data.estado_civil || '',
+          filhos: data.filhos?.toString() || '',
+          dependentes: data.dependentes?.toString() || '',
+        })
+      }
+      setCarregando(false)
+    }
+    carregarPerfil()
+  }, [])
 
   function atualizar(campo, valor) {
     setDados(prev => ({ ...prev, [campo]: valor }))
   }
 
   async function salvar() {
-    setCarregando(true)
+    setSalvando(true)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -31,8 +53,8 @@ export default function Perfil() {
       dependentes: parseInt(dados.dependentes) || 0,
     })
 
-    window.location.href = '/onboarding'
-    setCarregando(false)
+    window.location.href = '/dashboard'
+    setSalvando(false)
   }
 
   const inputStyle = {
@@ -42,18 +64,28 @@ export default function Perfil() {
 
   const selectStyle = { ...inputStyle, cursor: 'pointer', backgroundColor: '#1a0f2e', color: '#fff' }
 
+  if (carregando) return (
+    <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(255,255,255,0.5)' }}>Carregando...</p>
+    </main>
+  )
+
   return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
       <div style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '40px', width: '100%', maxWidth: '440px' }}>
 
         {/* HEADER */}
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px', gap: '16px' }}>
-  <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '80px', height: 'auto' }} />
-  <div style={{ textAlign: 'center' }}>
-    <h1 style={{ color: '#fff', fontSize: '18px', fontWeight: '800', margin: '0 0 4px' }}>Vamos nos conhecer!</h1>
-    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', margin: 0 }}>Isso me ajuda a te dar conselhos melhores</p>
-  </div>
-</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px', gap: '16px' }}>
+          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '80px', height: 'auto' }} />
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ color: '#fff', fontSize: '18px', fontWeight: '800', margin: '0 0 4px' }}>
+              {dados.nome ? `Olá, ${dados.nome}!` : 'Vamos nos conhecer!'}
+            </h1>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', margin: 0 }}>
+              {dados.nome ? 'Edite seus dados quando quiser' : 'Isso me ajuda a te dar conselhos melhores'}
+            </p>
+          </div>
+        </div>
 
         {/* PROGRESSO */}
         <div style={{ display: 'flex', gap: '6px', marginBottom: '28px' }}>
@@ -129,9 +161,9 @@ export default function Perfil() {
               <button onClick={() => setPasso(2)} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', color: '#fff', border: '0.5px solid rgba(255,255,255,0.15)', padding: '12px', borderRadius: '10px', fontSize: '14px', cursor: 'pointer' }}>
                 ← Voltar
               </button>
-              <button onClick={salvar} disabled={carregando}
+              <button onClick={salvar} disabled={salvando}
                 style={{ flex: 2, background: '#F5C842', color: '#1a0f2e', border: 'none', padding: '12px', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-                {carregando ? 'Salvando...' : 'Tudo certo! →'}
+                {salvando ? 'Salvando...' : 'Salvar perfil ✓'}
               </button>
             </div>
           </div>
