@@ -18,9 +18,9 @@ export default function Onboarding() {
 
       if (data) {
         setMensagens([{
-  role: 'assistant',
-  content: `Olá, ${data.nome}! 😊 Que bom te ver por aqui! Sou o Lio, seu assistente financeiro pessoal.\n\nMe conta seus gastos do mês como preferir — pode escrever direto, tipo: mercado, uber, ifood e os valores.`
-}])
+          role: 'assistant',
+          content: `Olá, ${data.nome}! 😊 Que bom te ver por aqui! Sou o Lio, seu assistente financeiro pessoal.\n\nMe conta seus gastos do mês como preferir — pode escrever direto, tipo: mercado, uber, ifood e os valores.`
+        }])
       }
     }
     carregarPerfil()
@@ -58,20 +58,20 @@ export default function Onboarding() {
 
   return (
     <main style={{ backgroundColor: '#1a0f2e', minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'inherit' }}>
-      
-      {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '0.5px solid rgba(255,255,255,0.1)', backgroundColor: '#2d1b4e' }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '40px', height: 'auto' }} />
-    <div>
-      <p style={{ color: '#fff', fontSize: '15px', fontWeight: '800', margin: 0 }}>Lio</p>
-      <p style={{ color: '#4ade80', fontSize: '11px', margin: 0 }}>● online</p>
-    </div>
-  </div>
-  <a href="/dashboard" style={{ background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '600' }}>
-    Ver dashboard →
-  </a>
-</div>
+
+      {/* HEADER FIXO */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '0.5px solid rgba(255,255,255,0.1)', backgroundColor: '#2d1b4e', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/lio.png" alt="Lio" className="lio-flutuando" style={{ width: '40px', height: 'auto' }} />
+          <div>
+            <p style={{ color: '#fff', fontSize: '15px', fontWeight: '800', margin: 0 }}>Lio</p>
+            <p style={{ color: '#4ade80', fontSize: '11px', margin: 0 }}>● online</p>
+          </div>
+        </div>
+        <a href="/dashboard" style={{ background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '600' }}>
+          Ver dashboard →
+        </a>
+      </div>
 
       {/* MENSAGENS */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
