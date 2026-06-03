@@ -18,9 +18,9 @@ export default function Onboarding() {
 
       if (data) {
         setMensagens([{
-          role: 'assistant',
-          content: `Olá, ${data.nome}! 😊 Que bom te ver por aqui! Sou o Lio, seu assistente financeiro pessoal.\n\nPara começar, me conta seus gastos do mês — pode escrever do jeito que preferir, como se estivesse me contando no WhatsApp. Por exemplo: "mercado 320, uber 45, ifood 35, academia 80"`
-        }])
+  role: 'assistant',
+  content: `Olá, ${data.nome}! 😊 Que bom te ver por aqui! Sou o Lio, seu assistente financeiro pessoal.\n\nMe conta seus gastos do mês como preferir — pode escrever direto, tipo: mercado, uber, ifood e os valores.`
+}])
       }
     }
     carregarPerfil()
